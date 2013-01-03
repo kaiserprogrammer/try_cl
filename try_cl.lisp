@@ -32,7 +32,7 @@
   (let ((user (make-instance 'user)))
     (db-add-user user db)
     (let ((name (user-package user)))
-      (SB-IMPL::%DEFPACKAGE name 'NIL 'NIL 'NIL 'NIL '("CL") 'NIL 'NIL 'NIL
+      (SB-IMPL::%DEFPACKAGE name 'NIL 'NIL 'NIL 'NIL (list "SAFE-CL") 'NIL 'NIL 'NIL
                             `(,name) 'NIL 'NIL nil))
     (id user)))
 
@@ -49,8 +49,10 @@
   (format nil "USER.~a" (id user)))
 
 (defun eval-in-session (user-id expression &optional (db *db*))
-  (let ((*read-eval* nil))
-    (let ((*package* (SB-INT:FIND-UNDELETED-PACKAGE-OR-LOSE
-                      (user-package (db-get-user user-id db)))))
-      (eval (read-from-string expression)))))
+  (if (cl-ppcre:scan ":" expression)
+      (error "No other internal or external symbols allowed.")
+      (let ((*read-eval* nil))
+        (let ((*package* (SB-INT:FIND-UNDELETED-PACKAGE-OR-LOSE
+                          (user-package (db-get-user user-id db)))))
+          (eval (read-from-string expression))))))
 

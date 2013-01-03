@@ -32,4 +32,12 @@
       (eval-in-session new-id "(defvar *test-abc* 2)")
       (is (= 2 (eval-in-session new-id "*test-abc*")) "different users have same session"))))
 
+(test no-eval-of-internal-symbols-in-other-packages
+  (let* ((*db* (make-instance 'memory-db))
+         (id (start-session)))
+    (signals (error "No other internal symbols allowed.")
+      (eval-in-session id "(cl:+ 1 1)"))
+    (signals (error "No other internal symbols allowed.")
+      (eval-in-session id "(cl::+ 1 1)"))))
+
 (run!)
