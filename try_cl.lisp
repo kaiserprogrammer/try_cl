@@ -10,6 +10,7 @@
 (in-package :try-cl)
 
 (defvar *db*)
+(defvar *default-timeout* 0)
 
 (defclass memory-db ()
   ((users :accessor users
@@ -54,11 +55,14 @@
 (defmethod user-package ((user user))
   (format nil "USER.~a" (id user)))
 
-(defun eval-in-session (user-id expression &optional (db *db*))
+(defun eval-in-session (user-id expression &key (db *db*) (timeout *default-timeout*))
   (let ((*read-eval* nil))
     (let ((*package* (SB-INT:FIND-UNDELETED-PACKAGE-OR-LOSE
                       (user-package (db-get-user user-id db)))))
-      (eval (safe-read expression)))))
+      (handler-case
+          (sb-ext:with-timeout timeout
+            (eval (safe-read expression)))
+        (SB-EXT:TIMEOUT (e) e)))))
 
 (defun safe-read (&rest args)
   (if (cl-ppcre:scan ":" (first args))

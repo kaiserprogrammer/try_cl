@@ -44,4 +44,11 @@
     (signals (error "can't read #. while *read-eval* is nil")
       (eval-in-session id "(let ((*read-eval* t)) (read-from-string \"#.(get-universal-time)\"))"))))
 
+(test eval-with-timeout
+  (let* ((*db* (make-instance 'memory-db))
+         (id (start-session)))
+    (is
+     (typep (eval-in-session id "(sleep 0.2)" :timeout 0.1)
+            'SB-EXT::TIMEOUT))))
+
 (run!)

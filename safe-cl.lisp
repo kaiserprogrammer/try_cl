@@ -11,6 +11,9 @@
           -
           *
           /
+          1+
+          1-
+          lambda
           exp
           expt
           log
@@ -30,4 +33,5 @@
           let
           let*
           t
+          sleep
           read-from-string))
