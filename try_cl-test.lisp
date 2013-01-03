@@ -11,4 +11,10 @@
       (is-true user)
       (is-true (active? user)))))
 
+(test closing-session
+  (let* ((*db* (make-instance 'memory-db))
+         (user (db-get-user (start-session) *db*)))
+    (close-session (id user))
+    (is-false (active? user))))
+
 (run!)

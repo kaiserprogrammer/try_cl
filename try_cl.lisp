@@ -37,3 +37,5 @@
   (awhen (db-get-user id db)
     (active? it)))
 
+(defun close-session (user-id &optional (db *db*))
+  (setf (active? (db-get-user user-id db)) nil))
