@@ -15,6 +15,21 @@
   (let* ((*db* (make-instance 'memory-db))
          (user (db-get-user (start-session) *db*)))
     (close-session (id user))
-    (is-false (active? user))))
+    (is-false (active? user))
+    (signals (error "The name")
+      (sb-int:find-undeleted-package-or-lose (user-package user)))))
+
+(test eval-in-session
+  (let* ((*db* (make-instance 'memory-db))
+         (id (start-session)))
+    (is (= 1 (eval-in-session id "1")))
+    (is (= 2 (eval-in-session id "(+ 1 1)")))
+    (signals (error "can't read #.")
+      (eval-in-session id "#.(get-universal-time)"))
+    (eval-in-session id "(defvar *test-abc* 1)")
+    (is (= 1 (eval-in-session id "*test-abc*")))
+    (let ((new-id (start-session)))
+      (eval-in-session new-id "(defvar *test-abc* 2)")
+      (is (= 2 (eval-in-session new-id "*test-abc*")) "different users have same session"))))
 
 (run!)

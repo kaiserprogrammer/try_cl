@@ -31,6 +31,9 @@
 (defun start-session (&optional (db *db*))
   (let ((user (make-instance 'user)))
     (db-add-user user db)
+    (let ((name (user-package user)))
+      (SB-IMPL::%DEFPACKAGE name 'NIL 'NIL 'NIL 'NIL '("CL") 'NIL 'NIL 'NIL
+                            `(,name) 'NIL 'NIL nil))
     (id user)))
 
 (defun active-session (id &optional (db *db*))
@@ -38,4 +41,16 @@
     (active? it)))
 
 (defun close-session (user-id &optional (db *db*))
-  (setf (active? (db-get-user user-id db)) nil))
+  (let ((user (db-get-user user-id db)))
+    (setf (active? user) nil)
+    (delete-package (user-package user))))
+
+(defmethod user-package ((user user))
+  (format nil "USER.~a" (id user)))
+
+(defun eval-in-session (user-id expression &optional (db *db*))
+  (let ((*read-eval* nil))
+    (let ((*package* (SB-INT:FIND-UNDELETED-PACKAGE-OR-LOSE
+                      (user-package (db-get-user user-id db)))))
+      (eval (read-from-string expression)))))
+
