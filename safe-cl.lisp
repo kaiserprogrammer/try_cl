@@ -7,4 +7,27 @@
 (defun read-from-string (&rest args)
   (apply #'try-cl::safe-read args))
 
-(export '(+ defvar format nil code-char eval read-from-string))
+(export '(+
+          -
+          *
+          /
+          exp
+          expt
+          log
+          defvar
+          defparameter
+          defun
+          defmacro
+          list
+          cons
+          map
+          mapcar
+          concatenate
+          format
+          nil
+          code-char
+          eval
+          let
+          let*
+          t
+          read-from-string))

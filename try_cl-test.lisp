@@ -40,6 +40,8 @@
     (signals (error "No other internal symbols allowed.")
       (eval-in-session id "(cl::+ 1 1)"))
     (signals (error "No other internal symbols allowed.")
-     (eval-in-session id "(eval (read-from-string (format nil \"(cl~a~a+ 1 1)\" (code-char 58) (code-char 58))))"))))
+      (eval-in-session id "(eval (read-from-string (format nil \"(cl~a~a+ 1 1)\" (code-char 58) (code-char 58))))"))
+    (signals (error "can't read #. while *read-eval* is nil")
+      (eval-in-session id "(let ((*read-eval* t)) (read-from-string \"#.(get-universal-time)\"))"))))
 
 (run!)
