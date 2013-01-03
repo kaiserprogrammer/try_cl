@@ -38,6 +38,8 @@
     (signals (error "No other internal symbols allowed.")
       (eval-in-session id "(cl:+ 1 1)"))
     (signals (error "No other internal symbols allowed.")
-      (eval-in-session id "(cl::+ 1 1)"))))
+      (eval-in-session id "(cl::+ 1 1)"))
+    (signals (error "No other internal symbols allowed.")
+     (eval-in-session id "(eval (read-from-string (format nil \"(cl~a~a+ 1 1)\" (code-char 58) (code-char 58))))"))))
 
 (run!)

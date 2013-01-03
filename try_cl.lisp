@@ -49,10 +49,12 @@
   (format nil "USER.~a" (id user)))
 
 (defun eval-in-session (user-id expression &optional (db *db*))
-  (if (cl-ppcre:scan ":" expression)
-      (error "No other internal or external symbols allowed.")
-      (let ((*read-eval* nil))
-        (let ((*package* (SB-INT:FIND-UNDELETED-PACKAGE-OR-LOSE
-                          (user-package (db-get-user user-id db)))))
-          (eval (read-from-string expression))))))
+  (let ((*read-eval* nil))
+    (let ((*package* (SB-INT:FIND-UNDELETED-PACKAGE-OR-LOSE
+                      (user-package (db-get-user user-id db)))))
+      (eval (safe-read expression)))))
 
+(defun safe-read (&rest args)
+  (if (cl-ppcre:scan ":" (first args))
+      (error "No other internal or external symbols allowed.")
+      (apply #'read-from-string args)))
