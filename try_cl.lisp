@@ -1,5 +1,11 @@
 (defpackage :try-cl
-  (:use :cl :anaphora :fiveam))
+  (:use :cl :anaphora :fiveam)
+  (:export
+   :safe-read
+   :eval-in-session
+   :close-session
+   :active-session
+   :start-session))
 
 (in-package :try-cl)
 
